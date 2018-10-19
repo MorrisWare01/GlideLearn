@@ -44,14 +44,36 @@
 
 ### Glide生命周期
 
+* Glide的RequestManager绑定了Fragment的生命周期和CONNECTIVITY_ACTION广播。
+* 当fragment的onStart回调时会触发requestManager内部requestTracker恢复请求。
+* 当fragment的onStop回调时会触发requestManager内部requestTracker停止请求。
+* 当接收到CONNECTIVITY_ACTION广播同时网络是连接状态时触发requestManager内部requestTracker重新请求数据
 
 ### Glide如何确定target的宽高
 
+* target的宽高是在SingleRequest.begin()时确定的
+* 当RequestOptions配置了overrideWidth和overrideHeight并且符合条件，那么宽高就确定了
+* 不符合条件时，会调用target.getSize(callback)方式获取宽高
+* 当ViewTarget的getSize()发生在View还没计算完成时，获取的宽高会不符合条件，这时
+ViewTarget会调用View.getViewObserver().addOnPreDrawListener()获取宽高
+
 ### Glide线程池
+
+* Glide中维持了DiskCacheExecutor,SourceExecutor,SourceUnlimitedExecutor,AnimationExecutor4种线程池
+* DiskCacheExecutor负责读取ResourceCache和DataCache，默认个数为1个，采用PriorityBlockingQueue
+* SourceExecutor负责获取图片数据和写入ResourceCache和DataCache，默认个数为处理器个数~4个，采用PriorityBlockingQueue
+* SourceUnlimitedExecutor线程数无上限，采用SynchronousQueue
+* AnimationExecutor线程数为1~2个，采用PriorityBlockingQueue
+* SourceUnlimitedExecutor和AnimationExecutor的作用和SourceExecutor一样，但是默认不工作，需要配置标识位
 
 ### GlideModule
 
+* GlideModule提供了applyOptions和registerComponents
+* applyOptions用于自定义GlideBuilder参数
+* registerComponents用于注册组件到Registry
+
 ### LruCache实现原理（Least Recently Used最近最少使用算法）
+
 
 
 ### DiskLruCache实现原理

@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         load.setOnClickListener { load() }
+        debugHttp.setOnClickListener { debugHttpLoad() }
         debugResourceCache.setOnClickListener { debugResourceCacheGenerator() }
         debugDataCache.setOnClickListener { debugDataCacheGenerator() }
         debugSource.setOnClickListener { debugSourceGenerator() }
@@ -28,6 +29,15 @@ class MainActivity : AppCompatActivity() {
             .transition(DrawableTransitionOptions())
             .thumbnail(GlideApp.with(this).load(R.mipmap.thumb))
             .error(GlideApp.with(this).load(R.mipmap.error))
+            .into(imageView)
+    }
+
+    private fun debugHttpLoad() {
+        GlideApp.with(this)
+            .load("https://github.com/bumptech/glide/raw/master/static/glide_logo.png")
+            .apply(RequestOptions()
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE))
             .into(imageView)
     }
 

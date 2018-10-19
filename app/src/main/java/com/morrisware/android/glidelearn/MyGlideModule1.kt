@@ -9,4 +9,7 @@ import com.bumptech.glide.module.LibraryGlideModule
  */
 @GlideModule(glideName = "GlideTest1")
 class MyGlideModule1 : LibraryGlideModule() {
+
+
+
 }
