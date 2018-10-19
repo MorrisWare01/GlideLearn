@@ -21,13 +21,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun load() {
-        Glide.with(this)
+        GlideApp.with(this)
             .load(R.mipmap.normal)
-            .apply(RequestOptions()
-                .transform(CircleCrop()))
+            .apply(GlideOptions()
+                .circleCrop())
             .transition(DrawableTransitionOptions())
-            .thumbnail(Glide.with(this).load(R.mipmap.thumb))
-            .error(Glide.with(this).load(R.mipmap.error))
+            .thumbnail(GlideApp.with(this).load(R.mipmap.thumb))
+            .error(GlideApp.with(this).load(R.mipmap.error))
             .into(imageView)
     }
 

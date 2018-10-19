@@ -11,7 +11,7 @@ import com.bumptech.glide.module.AppGlideModule
  * Created by MorrisWare on 2018/10/18.
  * Email: MorrisWare01@gmail.com
  */
-@GlideModule(glideName = "GlideTest")
+@GlideModule(glideName = "GlideApp")
 class MyGlideModule : AppGlideModule() {
 
     override fun applyOptions(context: Context, builder: GlideBuilder) {
