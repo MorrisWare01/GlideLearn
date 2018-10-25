@@ -79,6 +79,64 @@ ViewTarget会调用View.getViewObserver().addOnPreDrawListener()获取宽高
 * 解决方案：在加载时设置tag，显示时判断tag。
 * glide解决方案：在RequestBuilder.into(target)方法中，先获取target.getRequest上一次请求，如何与构造的新请求不同则清除请求。
 
+### Glide实现图片裁剪
+
+#### 圆形图片裁剪
+
+```java
+    // 使用PorterDuff.Mode.SRC_IN模式，以src的形状区域绘制dest
+    CIRCLE_CROP_BITMAP_PAINT = new Paint(CIRCLE_CROP_PAINT_FLAGS);
+    CIRCLE_CROP_BITMAP_PAINT.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
+    public static Bitmap circleCrop(@NonNull BitmapPool pool, @NonNull Bitmap inBitmap,
+          int destWidth, int destHeight) {
+        // 计算半径
+        int destMinEdge = Math.min(destWidth, destHeight);
+        float radius = destMinEdge / 2f;
+
+        int srcWidth = inBitmap.getWidth();
+        int srcHeight = inBitmap.getHeight();
+
+        float scaleX = destMinEdge / (float) srcWidth;
+        float scaleY = destMinEdge / (float) srcHeight;
+        float maxScale = Math.max(scaleX, scaleY);
+
+        float scaledWidth = maxScale * srcWidth;
+        float scaledHeight = maxScale * srcHeight;
+        float left = (destMinEdge - scaledWidth) / 2f;
+        float top = (destMinEdge - scaledHeight) / 2f;
+
+        RectF destRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
+
+        // Alpha is required for this transformation.
+        Bitmap toTransform = getAlphaSafeBitmap(pool, inBitmap);
+
+        Bitmap.Config outConfig = getAlphaSafeConfig(inBitmap);
+        Bitmap result = pool.get(destMinEdge, destMinEdge, outConfig);
+        result.setHasAlpha(true);
+
+        BITMAP_DRAWABLE_LOCK.lock();
+        try {
+          Canvas canvas = new Canvas(result);
+          // Draw a circle
+          canvas.drawCircle(radius, radius, radius, CIRCLE_CROP_SHAPE_PAINT);
+          // Draw the bitmap in the circle
+          canvas.drawBitmap(toTransform, null, destRect, CIRCLE_CROP_BITMAP_PAINT);
+          clear(canvas);
+        } finally {
+          BITMAP_DRAWABLE_LOCK.unlock();
+        }
+
+        if (!toTransform.equals(inBitmap)) {
+          pool.put(toTransform);
+        }
+
+        return result;
+      }
+```
+
+
+
 ### LruCache实现原理（Least Recently Used最近最少使用算法）
 
 
