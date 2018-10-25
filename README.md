@@ -45,8 +45,8 @@
 ### Glide生命周期
 
 * Glide的RequestManager绑定了Fragment的生命周期和CONNECTIVITY_ACTION广播。
-* 当fragment的onStart回调时会触发requestManager内部requestTracker恢复请求。
-* 当fragment的onStop回调时会触发requestManager内部requestTracker停止请求。
+* 当fragment的onStart回调时会触发requestManager内部resumeTracker恢复请求。
+* 当fragment的onStop回调时会触发requestManager内部pauseTracker停止请求。
 * 当接收到CONNECTIVITY_ACTION广播同时网络是连接状态时触发requestManager内部requestTracker重新请求数据
 
 ### Glide如何确定target的宽高
@@ -71,6 +71,13 @@ ViewTarget会调用View.getViewObserver().addOnPreDrawListener()获取宽高
 * GlideModule提供了applyOptions和registerComponents
 * applyOptions用于自定义GlideBuilder参数
 * registerComponents用于注册组件到Registry
+
+### Glide如何处理列表图片错位问题
+
+* 错误原因：类似RecyclerView控件的item在离开屏幕后会被重新使用达到复用效果，这时因加载网络图片有延时，
+就有可能导致图片加载的imageView控件已经离开屏幕被复用了，所以会发生错误效果
+* 解决方案：在加载时设置tag，显示时判断tag。
+* glide解决方案：在RequestBuilder.into(target)方法中，先获取target.getRequest上一次请求，如何与构造的新请求不同则清除请求。
 
 ### LruCache实现原理（Least Recently Used最近最少使用算法）
 
